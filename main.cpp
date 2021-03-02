@@ -87,8 +87,51 @@ int main(int argc, const char * argv[])
     } // end of while
     infile.close(); //close file
 
+
+    // get min and max x,y,z for bounding box
+    Point bnd_min = {1000,  1000,  1000};
+    Point bnd_max = {-1000, -1000, -1000};
+
+    for(auto i: vertices)
+    {
+        if(i.x < bnd_min.x) bnd_min.x = i.x;
+        if(i.y < bnd_min.y) bnd_min.y = i.y;
+        if(i.z < bnd_min.z) bnd_min.z = i.z;
+
+        if(i.x > bnd_max.x) bnd_max.x = i.x;
+        if(i.y > bnd_max.y) bnd_max.y = i.y;
+        if(i.z > bnd_max.z) bnd_max.z = i.z;
+    }
+
+    //compute number of hroi, vert and depth rows needed as per voxel size
+    Point rows_to_feed_Rows = {0,0,0};
+    //calculate x
+    if( std::fmod((bnd_max.x - bnd_min.x),voxel_size) != 0) // means there are residues
+    {
+        rows_to_feed_Rows.x = int((bnd_max.x - bnd_min.x)/voxel_size) +1;
+    }
+    else rows_to_feed_Rows.x = int((bnd_max.x - bnd_min.x)/voxel_size) ;
+
+    //calculate y
+    if( std::fmod((bnd_max.y - bnd_min.y),voxel_size) != 0) // means there are residues
+    {
+        rows_to_feed_Rows.y = int((bnd_max.y - bnd_min.y)/voxel_size) +1;
+    }
+    else rows_to_feed_Rows.y = int((bnd_max.y - bnd_min.y)/voxel_size) ;
+
+    //calculate z
+    if( std::fmod((bnd_max.z - bnd_min.z),voxel_size) != 0) // means there are residues
+    {
+        rows_to_feed_Rows.z = int((bnd_max.z - bnd_min.z)/voxel_size) +1;
+    }
+    else rows_to_feed_Rows.z = int((bnd_max.z - bnd_min.z)/voxel_size) ;
+
+    // std::cout<<rows_to_feed_Rows;
+
     // Create grid
-    Rows rows;
+    Rows rows(unsigned int (rows_to_feed_Rows.x) , unsigned int (rows_to_feed_Rows.y), unsigned int (rows_to_feed_Rows.z));
+    //    std::cout<<rows;
+
     // to do
     VoxelGrid voxels(rows.x, rows.y, rows.z);
 
