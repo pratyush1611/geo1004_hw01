@@ -20,10 +20,10 @@ float signed_volume(const Point &a, const Point &b, const Point &c, const Point 
     return 1/6 * ad.dot( bd.cross(cd) );
 }
 
-bool is_opossite(const Point& a, const Point& b, const Point& v0, const Point& v1, const Point& v2) 
+bool is_opposite(const Point& a, const Point& b, const Point& v0, const Point& v1, const Point& v2) 
 {
-    // signed volume multiple will be negative if the points are on the opossite sides
-    return (0 >= signed_volume(v0, v1, v2, a) * signed_volume(v0, v1, v2, b));
+    // signed volume multiple will be negative if the points are on the opposite sides
+    return ( 0 >= signed_volume(v0, v1, v2, a) * signed_volume(v0, v1, v2, b) );
 }
 
 bool intersects(const Point &orig, const Point &dest, const Point &v0, const Point &v1, const Point &v2)
@@ -32,10 +32,10 @@ bool intersects(const Point &orig, const Point &dest, const Point &v0, const Poi
     // three planes passing through the line and each vertex of the triangle
     // have the two other vertices on opposite sides
     return (
-        is_opossite(orig, dest, v0, v1, v2)
-        && is_opossite(v0, v1, orig, dest, v2)
-        && is_opossite(v1, v2, orig, dest, v0)
-        && is_opossite(v2, v0, orig, dest, v1)
+        is_opposite(orig, dest, v0, v1, v2)
+        && is_opposite(v0, v1, orig, dest, v2)
+        && is_opposite(v1, v2, orig, dest, v0)
+        && is_opposite(v2, v0, orig, dest, v1)
     );
 }
 
