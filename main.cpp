@@ -48,7 +48,7 @@ Point splitter(std::string str)
 
 int main(int argc, const char * argv[])
 {
-    const char *file_in = "E:\\TU_Delft\\yr_1\\q3\\GEO1004\\Assignment\\hw01\\hw1\\bag_bk.obj";
+    const char *file_in = ".\\..\\..\\..\\bag_bk.obj";
     const char *file_out = "vox.obj";
     float voxel_size = 1.0;
 
