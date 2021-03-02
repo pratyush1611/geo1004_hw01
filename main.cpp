@@ -1,4 +1,4 @@
-// Ondrej Vesely [5162130]
+// Ondrej Vesely  [5162130]
 // Pratyush Kumar [5359252]
 
 #include <iostream>
@@ -48,7 +48,7 @@ Point splitter(std::string str)
 
 int main(int argc, const char * argv[])
 {
-    const char *file_in = ".\\..\\..\\..\\bag_bk.obj";
+    const char *file_in = "E:\\TU_Delft\\yr_1\\q3\\GEO1004\\Assignment\\hw01\\hw1\\bag_bk.obj";
     const char *file_out = "vox.obj";
     float voxel_size = 1.0;
 
@@ -129,20 +129,32 @@ int main(int argc, const char * argv[])
     // Create grid
     Rows rows(unsigned int (no_voxels.x) , unsigned int (no_voxels.y), unsigned int (no_voxels.z));
 
-    // to do
+    // create voxels using voxelGrid inbuilt
     VoxelGrid voxels(rows.x, rows.y, rows.z);
+
+    unsigned int v = voxels(0,0,0);
+    std::cout<< v; // access the values in a voxel
+
 
     // Voxelise
     for (auto const &triangle: faces)
     {
-        // to do
-    }
+        // todo
+        std::vector< std::vector<Point> > face_vertx = { vertices[triangle[0]], vertices[triangle[1]], vertices[triangle[2]]};
+        //face_vert has the vertices of the face, v1 v2 v3
 
+    }
+//    std::vector<unsigned int> vertx = {1,2,3,4,5,6,7};
+//    for (auto const &i: vertx)
+//    {
+//        // todo
+//        std::cout<<i<<'\t';
+//    }
     // Fill model
-    // to do
+    // todo
 
     // Write voxels
-    // to do
+    // todo
 
     return 13;
 }
