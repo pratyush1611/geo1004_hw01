@@ -140,16 +140,16 @@ int main(int argc, const char * argv[])
     for (auto const &triangle: faces)
     {
         // todo
-        auto v1 = vertices[triangle[0]];
-        auto v2 = vertices[triangle[1]];
-        auto v3 = vertices[triangle[2]];
-
-        // vertices of the face, v1 v2 v3
-        // for every face, run all the voxel, or for every voxel run all the faces
-        // triangle is defined by 3 vertices making 2 vectors and a normal (not needed)
-        auto vec1 = v2-v1;
-        auto vec2 = v3-v1;
-        auto norm = vec1.cross(vec2);
+//        auto v1 = vertices[triangle[0]];
+//        auto v2 = vertices[triangle[1]];
+//        auto v3 = vertices[triangle[2]];
+//
+//        // vertices of the face, v1 v2 v3
+//        // for every face, run all the voxel, or for every voxel run all the faces
+//        // triangle is defined by 3 vertices making 2 vectors and a normal (not needed)
+//        auto vec1 = v2-v1;
+//        auto vec2 = v3-v1;
+////        auto norm = vec1.cross(vec2);
 
 
     }
