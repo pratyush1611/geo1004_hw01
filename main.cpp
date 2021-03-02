@@ -104,33 +104,30 @@ int main(int argc, const char * argv[])
     }
 
     //compute number of hroi, vert and depth rows needed as per voxel size
-    Point rows_to_feed_Rows = {0,0,0};
+    Point no_voxels = {0,0,0};
     //calculate x
     if( std::fmod((bnd_max.x - bnd_min.x),voxel_size) != 0) // means there are residues
     {
-        rows_to_feed_Rows.x = int((bnd_max.x - bnd_min.x)/voxel_size) +1;
+        no_voxels.x = int((bnd_max.x - bnd_min.x)/voxel_size) +1;
     }
-    else rows_to_feed_Rows.x = int((bnd_max.x - bnd_min.x)/voxel_size) ;
+    else no_voxels.x = int((bnd_max.x - bnd_min.x)/voxel_size) ;
 
     //calculate y
     if( std::fmod((bnd_max.y - bnd_min.y),voxel_size) != 0) // means there are residues
     {
-        rows_to_feed_Rows.y = int((bnd_max.y - bnd_min.y)/voxel_size) +1;
+        no_voxels.y = int((bnd_max.y - bnd_min.y)/voxel_size) +1;
     }
-    else rows_to_feed_Rows.y = int((bnd_max.y - bnd_min.y)/voxel_size) ;
+    else no_voxels.y = int((bnd_max.y - bnd_min.y)/voxel_size) ;
 
     //calculate z
     if( std::fmod((bnd_max.z - bnd_min.z),voxel_size) != 0) // means there are residues
     {
-        rows_to_feed_Rows.z = int((bnd_max.z - bnd_min.z)/voxel_size) +1;
+        no_voxels.z = int((bnd_max.z - bnd_min.z)/voxel_size) +1;
     }
-    else rows_to_feed_Rows.z = int((bnd_max.z - bnd_min.z)/voxel_size) ;
-
-    // std::cout<<rows_to_feed_Rows;
+    else no_voxels.z = int((bnd_max.z - bnd_min.z)/voxel_size) ;
 
     // Create grid
-    Rows rows(unsigned int (rows_to_feed_Rows.x) , unsigned int (rows_to_feed_Rows.y), unsigned int (rows_to_feed_Rows.z));
-    //    std::cout<<rows;
+    Rows rows(unsigned int (no_voxels.x) , unsigned int (no_voxels.y), unsigned int (no_voxels.z));
 
     // to do
     VoxelGrid voxels(rows.x, rows.y, rows.z);
