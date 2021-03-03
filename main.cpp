@@ -9,7 +9,6 @@
 #include "Point.h"
 #include "Rows.h"
 #include "VoxelGrid.h"
-#include "Bbox.h"
 
 float signed_volume(const Point &a, const Point &b, const Point &c, const Point &d)
 {
@@ -106,20 +105,12 @@ int main(int argc, const char * argv[])
 
     // get boundig box of all .obj vertices
     Bbox bounds = Bbox(vertices);
-
-    // compute number of rows in X, Y and Z axis as per voxel size
-    Rows rows = Rows(
-        int(bounds.size_x() / voxel_size) + 1,
-        int(bounds.size_y() / voxel_size) + 1,
-        int(bounds.size_z() / voxel_size) + 1
-    );
     
-    // create voxels using voxelGrid inbuilt
-    VoxelGrid voxels(rows.x, rows.y, rows.z);
+    // create voxels using voxelGrid with number rows in X, Y and Z axis as per voxel size
+    VoxelGrid voxels(bounds, voxel_size);
 
     unsigned int v = voxels(0,0,0);
     std::cout<< v; // access the values in a voxel
-
 
     // Voxelise
     for (auto const &triangle: faces)
@@ -146,6 +137,15 @@ int main(int argc, const char * argv[])
 
     // Write voxels
     // todo
+    for (int i = 0; i < voxels.voxels.size(); i++) {
+        if (voxels.voxels[i] == 0) continue; // skip exterior voxels
+
+        
+
+
+    };
+
+
 
     return 13;
 }
