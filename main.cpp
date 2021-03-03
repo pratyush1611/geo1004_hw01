@@ -140,6 +140,7 @@ int main(int argc, const char * argv[])
     // create voxels using voxelGrid with number rows in X, Y and Z axis as per voxel size
     VoxelGrid voxels(bounds, voxel_size);
 
+    voxels(0,0,0) = 1;
     unsigned int v = voxels(0,0,0);
     std::cout<< v; // access the values in a voxel
 
