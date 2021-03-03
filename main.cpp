@@ -60,6 +60,37 @@ Point splitter(std::string str)
     }
 }
 
+std::string to_obj(Point center, float size, int nth) {
+    auto& c = center;
+    float r = size/2;
+    int o = nth * 8 + 1;
+
+    char buffer[512];
+    sprintf(buffer,
+        "o %d \n"
+        "v %f %f %f \n" "v %f %f %f \n" "v %f %f %f \n" "v %f %f %f \n"
+        "v %f %f %f \n" "v %f %f %f \n" "v %f %f %f \n" "v %f %f %f \n"
+        "f %d %d %d %d \n" "f %d %d %d %d \n" "f %d %d %d %d \n"
+        "f %d %d %d %d \n" "f %d %d %d %d \n" "f %d %d %d %d \n",
+        nth,
+        c.x - r, c.y - r, c.z - r,
+        c.x + r, c.y - r, c.z - r,
+        c.x + r, c.y + r, c.z - r,
+        c.x - r, c.y + r, c.z - r,
+        c.x - r, c.y - r, c.z + r,
+        c.x + r, c.y - r, c.z + r,
+        c.x + r, c.y + r, c.z + r,
+        c.x - r, c.y + r, c.z + r,
+        0 + o, 1 + o, 5 + o, 4 + o,
+        0 + o, 3 + o, 2 + o, 1 + o,
+        0 + o, 4 + o, 7 + o, 3 + o,
+        1 + o, 2 + o, 6 + o, 5 + o,
+        2 + o, 3 + o, 7 + o, 6 + o,
+        4 + o, 5 + o, 6 + o, 7 + o
+    );
+    return buffer;
+}
+
 
 int main(int argc, const char * argv[])
 {
@@ -136,15 +167,20 @@ int main(int argc, const char * argv[])
     // todo
 
     // Write voxels
-    // todo
-    for (int i = 0; i < voxels.voxels.size(); i++) {
-        if (voxels.voxels[i] == 0) continue; // skip exterior voxels
+    std::ofstream file(file_out);
+    float size = voxel_size * 0.8;
 
-        
-
-
-    };
-
+    int nth = 0;
+    for (int x = 0; x < voxels.max_x; x++) {
+        for (int y = 0; y < voxels.max_y; y++) {
+            for (int z = 0; z < voxels.max_z; z++) {              
+                if (voxels(x, y, z) == 0) continue; // skip exterior voxels
+                file << to_obj(voxels.center(x, y, z), size, nth);
+                nth++;
+            }
+        }
+    }  
+    file.close();
 
 
     return 13;
