@@ -62,7 +62,7 @@ struct VoxelGrid {
     int max_row_z = int((join.max.z - domain.min.z) / domain.size_z() * max_z) + 1;
 
     std::vector<Rows> rows;
-    rows.reserve(max_row_x - min_row_x * max_row_y - min_row_y * max_row_z - min_row_z);
+    rows.reserve((max_row_x - min_row_x) * (max_row_y - min_row_y) * (max_row_z - min_row_z));
     for (int x = min_row_x; x < max_row_x; x++) {
         for (int y = min_row_y; x < max_row_y; y++) {
             for (int z = min_row_z; x < max_row_z; z++) {

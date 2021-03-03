@@ -23,6 +23,7 @@ float signed_volume(const Point &a, const Point &b, const Point &c, const Point 
 bool is_opposite(const Point& a, const Point& b, const Point& v0, const Point& v1, const Point& v2) 
 {
     // signed volume multiple will be negative if the points are on the opposite sides
+    // returns true if they are on opposite sides
     return ( 0 >= signed_volume(v0, v1, v2, a) * signed_volume(v0, v1, v2, b) );
 }
 
@@ -31,6 +32,8 @@ bool intersects(const Point &orig, const Point &dest, const Point &v0, const Poi
     // endpoints of the line are on opposite sides of the triangle
     // three planes passing through the line and each vertex of the triangle
     // have the two other vertices on opposite sides
+
+    //returns TRUE if all statements are TRUE, i.e. they are all opposite to one another
     return (
         is_opposite(orig, dest, v0, v1, v2)
         && is_opposite(v0, v1, orig, dest, v2)
@@ -91,12 +94,33 @@ std::string to_obj(Point center, float size, int nth) {
     return buffer;
 }
 
+std::vector<std::vector<Point>> OD_maker(Point vox_center , float voxel_size)
+{
+    Point xline_orig = vox_center - Point {voxel_size/2, 0, 0};
+    Point xline_dest = vox_center + Point {voxel_size/2, 0, 0};
 
+    Point yline_orig = vox_center - Point {0, voxel_size/2, 0};
+    Point yline_dest = vox_center + Point {0, voxel_size/2, 0};
+
+    Point zline_orig = vox_center - Point {0, 0, voxel_size/2};
+    Point zline_dest = vox_center + Point {0, 0, voxel_size/2};
+
+    std::vector<Point> xline{xline_orig, xline_dest};
+    std::vector<Point> yline{yline_orig, yline_dest};
+    std::vector<Point> zline{zline_orig, zline_dest};
+    //return a vector of these origin destinations vectors
+    std::vector<std::vector<Point>> returned_output;
+    returned_output =  {xline, yline, zline};
+
+    return returned_output;
+}
+
+////////////////////////////////////////////______________M.A.I.N__________////////////////
 int main(int argc, const char * argv[])
 {
     const char *file_in = "bag_bk.obj";
     const char *file_out = "vox.obj";
-    float voxel_size = 1.0;
+    float voxel_size = 10.0;
 
     // Read file
     std::vector<Point> vertices;
@@ -141,32 +165,50 @@ int main(int argc, const char * argv[])
     VoxelGrid voxels(bounds, voxel_size);
 
     voxels(0,0,0) = 1;
-    unsigned int v = voxels(0,0,0);
-    std::cout<< v; // access the values in a voxel
+//    unsigned int v = voxels(0,0,0);
+    std::cout<< "starting the faces loop now\n"; // access the values in a voxel
 
     // Voxelise
     for (auto const &triangle: faces)
     {
         // todo
-//        auto v1 = vertices[triangle[0]];
-//        auto v2 = vertices[triangle[1]];
-//        auto v3 = vertices[triangle[2]];
-//
-//        // vertices of the face, v1 v2 v3
-//        // for every face, run all the voxel, or for every voxel run all the faces
-//        // triangle is defined by 3 vertices making 2 vectors and a normal (not needed)
-//        auto vec1 = v2-v1;
-//        auto vec2 = v3-v1;
-////        auto norm = vec1.cross(vec2);
+        if(triangle.size() != 3) std::cout << "haha, found ya, " << triangle.size() <<'\n';
 
+        // extract vertex of face and store it in fc_rvtx
+        std::vector<Point> fc_vrtx = {vertices[triangle[0] - 1],vertices[triangle[1] - 1],vertices[triangle[2] - 1]};
 
+        // for every face, run all the voxel, or for every voxel run all the faces
+        Bbox facebounds(fc_vrtx); //get bbox of the face
+        //find voxels in this bbox
+        std::cout<< "before rows thingy \n";
+        std::vector<Rows> bnd_vox = voxels.intersection(facebounds);
+        std::cout<<"starting loop to do intersection check\n";
+        //check intersections with these voxels
+        for(auto row_: bnd_vox)
+        {
+            //get center coord of the voxel in this iteration
+            Point vox_center =  voxels.center(row_.x ,row_.y ,row_.z  );
+            //get coord of the 3 lines
+            //lets call the line xline, yline, zline
+            //and the two ends of this line are orig and dest
+            std::vector<std::vector<Point>> OD_pts =  OD_maker( vox_center ,  voxel_size);
+            //once you have the orig dest do the test
+            if(intersects(OD_pts[0][0], OD_pts[0][1], fc_vrtx[0], fc_vrtx[1], fc_vrtx[2])
+            || intersects(OD_pts[1][0], OD_pts[1][1], fc_vrtx[0], fc_vrtx[1], fc_vrtx[2])
+            || intersects(OD_pts[2][0], OD_pts[2][1], fc_vrtx[0], fc_vrtx[1], fc_vrtx[2]))
+            {
+                //voxel is ok
+                voxels(row_.x, row_.y, row_.z) = 1;
+            }
+
+        }
     }
 
-    std::cout<<voxels.max_x;
+    std::cout<<voxels.max_x<<"lol\n";
 
     // Fill model
     // todo
-
+    std::cout<<"starting write operation\n";
     // Write voxels
     std::ofstream file(file_out);
     float size = voxel_size * 0.8;
@@ -174,13 +216,13 @@ int main(int argc, const char * argv[])
     int nth = 0;
     for (int x = 0; x < voxels.max_x; x++) {
         for (int y = 0; y < voxels.max_y; y++) {
-            for (int z = 0; z < voxels.max_z; z++) {              
+            for (int z = 0; z < voxels.max_z; z++) {
                 if (voxels(x, y, z) == 2) continue; // skip exterior voxels
                 file << to_obj(voxels.center(x, y, z), size, nth);
                 nth++;
             }
         }
-    }  
+    }
     file.close();
 
 
