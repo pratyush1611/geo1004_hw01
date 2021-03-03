@@ -36,11 +36,32 @@ struct VoxelGrid {
   }
 
   Point center(int x, int y, int z) {
-      return Point(
-          domain.min.x + (x + 1 / 2) * voxel_size,
-          domain.min.y + (y + 1 / 2) * voxel_size,
-          domain.min.z + (z + 1 / 2) * voxel_size
-      );
+    return Point(
+        domain.min.x + (x + 1 / 2) * voxel_size,
+        domain.min.y + (y + 1 / 2) * voxel_size,
+        domain.min.z + (z + 1 / 2) * voxel_size
+    );
+  }
+
+  std::vector<Rows> intersection(Bbox bbox) {
+    Bbox join = domain.intersection(bbox);
+    int min_row_x = int((join.min.x - domain.min.x) / domain.size_x() * max_x);
+    int max_row_x = int((join.max.x - domain.min.x) / domain.size_x() * max_x) + 1;
+    int min_row_y = int((join.min.y - domain.min.y) / domain.size_y() * max_y);
+    int max_row_y = int((join.max.y - domain.min.y) / domain.size_y() * max_y) + 1;
+    int min_row_z = int((join.min.z - domain.min.z) / domain.size_z() * max_z);
+    int max_row_z = int((join.max.z - domain.min.z) / domain.size_z() * max_z) + 1;
+
+    std::vector<Rows> rows;
+    rows.reserve(max_row_x - min_row_x * max_row_y - min_row_y * max_row_z - min_row_z);
+    for (int x = min_row_x; x < max_row_x; x++) {
+        for (int y = min_row_y; x < max_row_y; y++) {
+            for (int z = min_row_z; x < max_row_z; z++) {
+                rows.push_back(Rows(x, y, z));
+            }
+        }
+    }
+    return rows;
   }
 };
 
