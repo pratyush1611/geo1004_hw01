@@ -19,7 +19,7 @@ struct VoxelGrid {
     max_z = int(domain.size_z() / voxel_size) + 1;
     int size = max_x * max_y * max_z;
     voxels.reserve(size);
-    for (unsigned int i = 0; i < size; ++i) voxels.push_back(0);
+    for (unsigned int i = 0; i < size; ++i) voxels.push_back(2);
   }
   
   unsigned int &operator()(const unsigned int &x, const unsigned int &y, const unsigned int &z) {
@@ -71,6 +71,30 @@ struct VoxelGrid {
         }
     }
     return rows;
+  }
+
+  bool is_inside(int x, int y, int z) {
+      return (
+             x >= 0 && x < max_x
+          && y >= 0 && y < max_y
+          && z >= 0 && z < max_z
+          );
+  }
+
+  unsigned int& value(const unsigned int& x, const unsigned int& y, const unsigned int& z) {
+      return voxels[x + y * max_x + z * max_x * max_y];
+  }
+
+  void fill(int x, int y, int z) {
+      if (is_inside(x, y, z) && value(x, y, z) != 1 ) {
+          voxels[x + y * max_x + z * max_x * max_y] = 0;
+          fill(x - 1, y - 0, z - 0);
+          fill(x + 1, y - 0, z - 0);
+          fill(x - 0, y + 1, z - 0);
+          fill(x - 0, y - 1, z - 0);
+          fill(x - 0, y - 0, z + 1);
+          fill(x - 0, y - 0, z - 1);
+      }
   }
 };
 
