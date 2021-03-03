@@ -64,8 +64,8 @@ struct VoxelGrid {
     std::vector<Rows> rows;
     rows.reserve((max_row_x - min_row_x) * (max_row_y - min_row_y) * (max_row_z - min_row_z));
     for (int x = min_row_x; x < max_row_x; x++) {
-        for (int y = min_row_y; x < max_row_y; y++) {
-            for (int z = min_row_z; x < max_row_z; z++) {
+        for (int y = min_row_y; y < max_row_y; y++) {
+            for (int z = min_row_z; z < max_row_z; z++) {
                 rows.push_back(Rows(x, y, z));
             }
         }
