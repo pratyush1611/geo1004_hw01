@@ -66,7 +66,7 @@ struct VoxelGrid {
     for (int x = min_row_x; x < max_row_x; x++) {
         for (int y = min_row_y; y < max_row_y; y++) {
             for (int z = min_row_z; z < max_row_z; z++) {
-                rows.push_back(Rows(x, y, z));
+                if (is_inside(x, y, z)) rows.push_back(Rows(x, y, z));
             }
         }
     }
