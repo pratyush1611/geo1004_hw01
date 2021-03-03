@@ -35,4 +35,19 @@ struct Bbox {
 			if (i.z > max.z) max.z = i.z;
 		}
 	}
+
+	Bbox intersection(Bbox _other) {
+		Bbox other = Bbox();
+		other.min = _other.min;
+		other.max = _other.max;
+
+		if (max.x < other.max.x) other.max.x = max.x;
+		if (max.y < other.max.y) other.max.y = max.y;
+		if (max.z < other.max.z) other.max.z = max.z;
+		if (min.x > other.min.x) other.min.x = min.x;
+		if (min.y > other.min.y) other.min.y = min.y;
+		if (min.z > other.min.z) other.min.z = min.z;
+
+		return other;
+	}
 };
