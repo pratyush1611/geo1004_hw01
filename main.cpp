@@ -9,6 +9,7 @@
 #include "Point.h"
 #include "Rows.h"
 #include "VoxelGrid.h"
+#include "Bbox.h"
 
 float signed_volume(const Point &a, const Point &b, const Point &c, const Point &d)
 {
@@ -58,7 +59,6 @@ Point splitter(std::string str)
         Point pt = Point{x, y, z};
         return pt;
     }
-
 }
 
 
@@ -104,43 +104,32 @@ int main(int argc, const char * argv[])
     infile.close(); //close file
 
 
-    // get min and max x,y,z for bounding box
-    Point bnd_min = {1000,  1000,  1000};
-    Point bnd_max = {-1000, -1000, -1000};
-
-    for(auto i: vertices)
-    {
-        if(i.x < bnd_min.x) bnd_min.x = i.x;
-        if(i.y < bnd_min.y) bnd_min.y = i.y;
-        if(i.z < bnd_min.z) bnd_min.z = i.z;
-
-        if(i.x > bnd_max.x) bnd_max.x = i.x;
-        if(i.y > bnd_max.y) bnd_max.y = i.y;
-        if(i.z > bnd_max.z) bnd_max.z = i.z;
-    }
+    // get boundig box of all .obj vertices
+    Bbox bounds = Bbox(vertices);
 
     //compute number of hroi, vert and depth rows needed as per voxel size
     Point no_voxels = {0,0,0};
+    
     //calculate x
-    if( std::fmod((bnd_max.x - bnd_min.x),voxel_size) != 0) // means there are residues
+    if( std::fmod((bounds.max.x - bounds.min.x), voxel_size) != 0) // means there are residues
     {
-        no_voxels.x = int((bnd_max.x - bnd_min.x)/voxel_size) +1;
+        no_voxels.x = int((bounds.max.x - bounds.min.x)/voxel_size) +1;
     }
-    else no_voxels.x = int((bnd_max.x - bnd_min.x)/voxel_size) ;
+    else no_voxels.x = int((bounds.max.x - bounds.min.x)/voxel_size) ;
 
     //calculate y
-    if( std::fmod((bnd_max.y - bnd_min.y),voxel_size) != 0) // means there are residues
+    if( std::fmod((bounds.max.y - bounds.min.y),voxel_size) != 0) // means there are residues
     {
-        no_voxels.y = int((bnd_max.y - bnd_min.y)/voxel_size) +1;
+        no_voxels.y = int((bounds.max.y - bounds.min.y)/voxel_size) +1;
     }
-    else no_voxels.y = int((bnd_max.y - bnd_min.y)/voxel_size) ;
+    else no_voxels.y = int((bounds.max.y - bounds.min.y)/voxel_size) ;
 
     //calculate z
-    if( std::fmod((bnd_max.z - bnd_min.z),voxel_size) != 0) // means there are residues
+    if( std::fmod((bounds.max.z - bounds.min.z),voxel_size) != 0) // means there are residues
     {
-        no_voxels.z = int((bnd_max.z - bnd_min.z)/voxel_size) +1;
+        no_voxels.z = int((bounds.max.z - bounds.min.z)/voxel_size) +1;
     }
-    else no_voxels.z = int((bnd_max.z - bnd_min.z)/voxel_size) ;
+    else no_voxels.z = int((bounds.max.z - bounds.min.z)/voxel_size) ;
 
     // Create grid
     Rows rows(unsigned int (no_voxels.x) , unsigned int (no_voxels.y), unsigned int (no_voxels.z));
