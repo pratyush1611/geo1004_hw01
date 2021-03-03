@@ -6,17 +6,18 @@
 
 struct VoxelGrid {
   std::vector<unsigned int> voxels;
-  unsigned int max_x, max_y, max_z, size;
+  unsigned int max_x, max_y, max_z;
   Bbox domain;
   float voxel_size;
 
   VoxelGrid(Bbox _domain, float _voxel_size) {
     domain = _domain;
     voxel_size = _voxel_size;
+
     max_x = int(domain.size_x() / voxel_size) + 1;
     max_y = int(domain.size_y() / voxel_size) + 1;
     max_z = int(domain.size_z() / voxel_size) + 1;
-    size = max_x * max_y * max_z;
+    int size = max_x * max_y * max_z;
     voxels.reserve(size);
     for (unsigned int i = 0; i < size; ++i) voxels.push_back(0);
   }
@@ -33,6 +34,14 @@ struct VoxelGrid {
     assert(y >= 0 && y < max_y);
     assert(z >= 0 && z < max_z);
     return voxels[x + y*max_x + z*max_x*max_y];
+  }
+
+  float volume() {
+      float half_vox = voxel_size * voxel_size * voxel_size / 2;
+      float total = 0;
+      for (float val : voxels) {
+          total += val * half_vox;
+      }
   }
 
   Point center(int x, int y, int z) {
