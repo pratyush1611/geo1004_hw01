@@ -1,7 +1,11 @@
 #include "Point.h"
+#include "Rows.h"
 
 struct Bbox {
 	Point min, max;
+	float size_x() { return max.x - min.x; }
+	float size_y() { return max.y - min.y; }
+	float size_z() { return max.z - min.z; }
 
 	Bbox() {
 		min = Point();

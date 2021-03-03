@@ -107,33 +107,13 @@ int main(int argc, const char * argv[])
     // get boundig box of all .obj vertices
     Bbox bounds = Bbox(vertices);
 
-    //compute number of hroi, vert and depth rows needed as per voxel size
-    Point no_voxels = {0,0,0};
+    // compute number of rows in X, Y and Z axis as per voxel size
+    Rows rows = Rows(
+        int(bounds.size_x() / voxel_size) + 1,
+        int(bounds.size_y() / voxel_size) + 1,
+        int(bounds.size_z() / voxel_size) + 1
+    );
     
-    //calculate x
-    if( std::fmod((bounds.max.x - bounds.min.x), voxel_size) != 0) // means there are residues
-    {
-        no_voxels.x = int((bounds.max.x - bounds.min.x)/voxel_size) +1;
-    }
-    else no_voxels.x = int((bounds.max.x - bounds.min.x)/voxel_size) ;
-
-    //calculate y
-    if( std::fmod((bounds.max.y - bounds.min.y),voxel_size) != 0) // means there are residues
-    {
-        no_voxels.y = int((bounds.max.y - bounds.min.y)/voxel_size) +1;
-    }
-    else no_voxels.y = int((bounds.max.y - bounds.min.y)/voxel_size) ;
-
-    //calculate z
-    if( std::fmod((bounds.max.z - bounds.min.z),voxel_size) != 0) // means there are residues
-    {
-        no_voxels.z = int((bounds.max.z - bounds.min.z)/voxel_size) +1;
-    }
-    else no_voxels.z = int((bounds.max.z - bounds.min.z)/voxel_size) ;
-
-    // Create grid
-    Rows rows(unsigned int (no_voxels.x) , unsigned int (no_voxels.y), unsigned int (no_voxels.z));
-
     // create voxels using voxelGrid inbuilt
     VoxelGrid voxels(rows.x, rows.y, rows.z);
 
