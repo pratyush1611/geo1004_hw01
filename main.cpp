@@ -175,7 +175,7 @@ int main(int argc, const char * argv[])
     for (int x = 0; x < voxels.max_x; x++) {
         for (int y = 0; y < voxels.max_y; y++) {
             for (int z = 0; z < voxels.max_z; z++) {              
-                if (voxels(x, y, z) == 0) continue; // skip exterior voxels
+                if (voxels(x, y, z) == 2) continue; // skip exterior voxels
                 file << to_obj(voxels.center(x, y, z), size, nth);
                 nth++;
             }
