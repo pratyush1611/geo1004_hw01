@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "Point.h"
+#include "Rows.h"
 #include "VoxelGrid.h"
 
 float signed_volume(const Point &a, const Point &b, const Point &c, const Point &d)
