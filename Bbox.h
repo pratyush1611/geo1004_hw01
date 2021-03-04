@@ -11,15 +11,6 @@ struct Bbox {
 		max = Point();
 	}
 
-	Bbox(float minx, float miny, float minz, float maxx, float maxy, float maxz) {
-		this->min.x = minx;
-		this->min.y = miny;
-		this->min.z = minz;
-		this->min.x = minx;
-		this->min.y = miny;
-		this->min.z = minz;
-	}
-
 	Bbox(std::vector<Point> points) {
 		if (points.size() < 1) throw("Failed to construct Bbox from empty point vector.");
 		min = points[0];

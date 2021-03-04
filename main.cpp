@@ -30,8 +30,8 @@ bool is_opposite(const Point& a, const Point& b, const Point& v0, const Point& v
 bool intersects(const Point &orig, const Point &dest, const Point &v0, const Point &v1, const Point &v2)
 {
     // endpoints of the line are on opposite sides of the triangle
-    // three planes passing through the line and each vertex of the triangle
-    // have the two other vertices on opposite sides
+    // and three planes passing through the line and each vertex 
+    // of the triangle have the two other vertices on opposite sides
     return (
         is_opposite(orig, dest, v0, v1, v2)
         && is_opposite(v0, v1, orig, dest, v2)
@@ -39,16 +39,31 @@ bool intersects(const Point &orig, const Point &dest, const Point &v0, const Poi
     );
 }
 
+bool voxel_intersects(const Point& center, const float& size, const Point& v0, const Point& v1, const Point& v2) 
+{
+    float half = size / 2.0;
+    const Point& c = center;
+    const Point 
+        xline_orig = Point{ c.x - half, c.y, c.z },
+        xline_dest = Point{ c.x + half, c.y, c.z },
+        yline_orig = Point{ c.x, c.y - half, c.z },
+        yline_dest = Point{ c.x, c.y + half, c.z },
+        zline_orig = Point{ c.x, c.y, c.z - half },
+        zline_dest = Point{ c.x, c.y, c.z + half };
+    
+    return (intersects(xline_orig, xline_dest, v0, v1, v2)
+         || intersects(yline_orig, yline_dest, v0, v1, v2)
+         || intersects(zline_orig, zline_dest, v0, v1, v2) );
+}
+
 Point splitter(std::string str)
 {
     // split by x y z
     std::istringstream linestream(str);
-    std::vector<std::string> split_line
-            {
-                    std::istream_iterator<std::string>{linestream},
-                    std::istream_iterator<std::string>{}
-            };
-
+    std::vector<std::string> split_line {
+        std::istream_iterator<std::string>{linestream},
+        std::istream_iterator<std::string>{}
+    };
     //convert char to float
     if (split_line.size() == 4)
     {
@@ -61,9 +76,9 @@ Point splitter(std::string str)
 }
 
 std::string to_obj(Point center, float size, int nth) {
-    auto& c = center;
-    float r = size/2;
-    int o = nth * 8 + 1;
+    const auto& c = center;
+    const float r = size/2;
+    const int o = nth * 8 + 1;
 
     char buffer[512];
     sprintf(buffer,
@@ -89,26 +104,6 @@ std::string to_obj(Point center, float size, int nth) {
         4 + o, 5 + o, 6 + o, 7 + o
     );
     return buffer;
-}
-
-std::vector<std::vector<Point>> OD_maker(Point vox_center , float voxel_size)
-{
-    float half = voxel_size / 2.0;
-    Point xline_orig = vox_center - Point {half, 0, 0};
-    Point xline_dest = vox_center + Point {half, 0, 0};
-
-    Point yline_orig = vox_center - Point {0, half, 0};
-    Point yline_dest = vox_center + Point {0, half, 0};
-
-    Point zline_orig = vox_center - Point {0, 0, half};
-    Point zline_dest = vox_center + Point {0, 0, half};
-
-    std::vector<Point> xline{xline_orig, xline_dest};
-    std::vector<Point> yline{yline_orig, yline_dest};
-    std::vector<Point> zline{zline_orig, zline_dest};
-    
-    std::vector<std::vector<Point>> result{ xline, yline, zline };
-    return result;
 }
 
 
@@ -141,9 +136,9 @@ int main(int argc, const char * argv[])
         else if (strnicmp(str.c_str(), "f", strlen("v") ) == 0)
         {
             Point vert = splitter(str);
-            unsigned int fx = static_cast<unsigned int>(vert.x);
-            unsigned int fy = static_cast<unsigned int>(vert.y);
-            unsigned int fz = static_cast<unsigned int>(vert.z);
+            unsigned int fx = static_cast<unsigned int>(vert.x - 1);
+            unsigned int fy = static_cast<unsigned int>(vert.y - 1);
+            unsigned int fz = static_cast<unsigned int>(vert.z - 1);
 
             std::vector<unsigned int> fac = {fx,fy,fz};
             faces.push_back(fac);
@@ -153,71 +148,52 @@ int main(int argc, const char * argv[])
 
 
     // get boundig box of all .obj vertices
-    Bbox bounds = Bbox(vertices);
+    const Bbox bounds = Bbox(vertices);
     
     // create voxels using voxelGrid with number rows in X, Y and Z axis as per voxel size
     VoxelGrid voxels(bounds, voxel_size);
     
-    std::cout << "Voxelizing the model \n";
-    
     // Voxelise
+    std::cout << "Voxelizing the model " << "\n";
+    
     for (auto const &triangle: faces)
     {
-        // extract vertex of face and store it in fc_rvtx
-        std::vector<Point> fc_vrtx = {vertices[triangle[0] - 1], vertices[triangle[1] - 1], vertices[triangle[2] - 1]};
-
-        // for every face, run all the voxel, or for every voxel run all the faces
-        Bbox facebounds(fc_vrtx); //get bbox of the face
-        //find voxels in this bbox
-        std::vector<Rows> bnd_vox = voxels.intersection(facebounds);
-        //check intersections with these voxels
-        for(auto row_: bnd_vox)
-        {
-            //get center coord of the voxel in this iteration
-            Point vox_center =  voxels.center(row_.x ,row_.y ,row_.z  );
-            //get coord of the 3 lines
-            //lets call the line xline, yline, zline
-            //and the two ends of this line are orig and dest
-            std::vector<std::vector<Point>> OD_pts =  OD_maker(vox_center, voxel_size);
-            //once you have the orig dest do the test
-            if(intersects(OD_pts[0][0], OD_pts[0][1], fc_vrtx[0], fc_vrtx[1], fc_vrtx[2])
-            || intersects(OD_pts[1][0], OD_pts[1][1], fc_vrtx[0], fc_vrtx[1], fc_vrtx[2])
-            || intersects(OD_pts[2][0], OD_pts[2][1], fc_vrtx[0], fc_vrtx[1], fc_vrtx[2]))
-            {
-                //voxel is ok
-                voxels(row_.x, row_.y, row_.z) = 1;
+        const Point&
+            v0 = vertices[triangle[0]],
+            v1 = vertices[triangle[1]],
+            v2 = vertices[triangle[2]];
+        
+        // get bbox of the face
+        const Bbox bbox = Bbox(std::vector<Point>{v0, v1, v2});
+        // find voxels in this bbox
+        const std::vector<Rows> bbox_rows = voxels.intersection(bbox);
+        // check intersections with these voxels
+        for (auto rows : bbox_rows) {
+            if (voxel_intersects(voxels.center(rows.x, rows.y, rows.z), voxel_size, v0, v1, v2)) {
+                voxels(rows.x, rows.y, rows.z) = 1;
             }
-        }
+        }      
     }
 
     // Fill model
-    // todo: snowflake method
+    std::cout << "Filling the interior " << "\n";
 
-    for(int i= 0; i<voxels.max_x; i++)
-    {
-        for(int j=0 ;  j<voxels.max_y; j++)
-        {
-            int flag=0;
-            for(int k=voxels.max_z-1; k>=0 ;k--)
-            {
-                if( voxels(i,j,k) == 1)//touched a filled voxel
-                {
-                    flag=1;
-                }
-
-                if(flag != 1) //means not hit the boudary yet
-                {
-                    //update the cell value to exterior
-                    voxels(i,j,k) = 0;
-                }
+    for(int i= 0; i<voxels.max_x; i++) {
+        for(int j=0 ;  j<voxels.max_y; j++) {
+            for(int k=voxels.max_z-1; k>=0; k--) {
+                if (voxels(i, j, k) == 1) break; // touched a boundary voxel
+                else voxels(i, j, k) = 0;
             }
-
         }
     }
 
-    std::cout << "Writing to " << file_out << "\n";
+    // Get volume
+    std::cout << "\n\t" << "Total volume of the model is: ";
+    std::cout << voxels.volume() << " m3 " << "\n\n";
 
     // Write voxels
+    std::cout << "Writing model to " << file_out << "\n";
+
     std::ofstream file(file_out);
     float size = voxel_size * 0.7;
 
@@ -233,7 +209,5 @@ int main(int argc, const char * argv[])
     }
     file.close();
 
-
-
-    return 13;
+    return 0;
 }

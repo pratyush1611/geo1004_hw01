@@ -38,11 +38,10 @@ struct VoxelGrid {
   }
 
   float volume() {
-      float half_vox = voxel_size * voxel_size * voxel_size / 2;
+      float vox = voxel_size * voxel_size * voxel_size;
       float total = 0;
-      for (float val : voxels) {
-          total += val * half_vox;
-      }
+      for (float val : voxels) { total += val; }
+      return total / 2 * vox;
   }
 
   Point center(int x, int y, int z) {
