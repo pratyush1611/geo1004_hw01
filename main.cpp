@@ -23,7 +23,7 @@ float signed_volume(const Point &a, const Point &b, const Point &c, const Point 
 bool is_opposite(const Point& a, const Point& b, const Point& v0, const Point& v1, const Point& v2) 
 {
     // signed volume multiple will be negative if the points are on the opposite sides
-    return ( 0 >= signed_volume(v0, v1, v2, a) * signed_volume(v0, v1, v2, b) );
+    return ( 0 > signed_volume(v0, v1, v2, a) * signed_volume(v0, v1, v2, b) );
 }
 
 
