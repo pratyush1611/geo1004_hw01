@@ -127,7 +127,7 @@ int main(int argc, const char * argv[])
     std::ifstream infile(file_in, std::ifstream::in);
     if(!infile)
     {
-        std::cout<<"cant open :(\n";
+        std::cout<<"Cant open :(\n";
         return 1;
     }
 
@@ -160,11 +160,9 @@ int main(int argc, const char * argv[])
     
     // create voxels using voxelGrid with number rows in X, Y and Z axis as per voxel size
     VoxelGrid voxels(bounds, voxel_size);
-
-    voxels(0,0,0) = 1;
-//    unsigned int v = voxels(0,0,0);
-    std::cout<< "starting the faces loop now\n"; // access the values in a voxel
-
+    
+    std::cout << "Voxelizing the model. \n";
+    
     // Voxelise
     for (auto const &triangle: faces)
     {
@@ -195,15 +193,14 @@ int main(int argc, const char * argv[])
                 //voxel is ok
                 voxels(row_.x, row_.y, row_.z) = 1;
             }
-
         }
     }
 
-    std::cout<<voxels.max_x<<"lol\n";
-
     // Fill model
     // todo
-    std::cout<<"starting write operation\n";
+    
+    std::cout << "Writing to " << file_out << "\n";
+    
     // Write voxels
     std::ofstream file(file_out);
     float size = voxel_size * 0.8;
