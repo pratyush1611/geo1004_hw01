@@ -54,31 +54,31 @@ struct VoxelGrid {
 
   std::vector<Rows> intersection(Bbox bbox) {
     Bbox join = domain.intersection(bbox);
-    int min_row_x = int((join.min.x - domain.min.x) / domain.size_x() * max_x);
-    int max_row_x = int((join.max.x - domain.min.x) / domain.size_x() * max_x) + 1;
-    int min_row_y = int((join.min.y - domain.min.y) / domain.size_y() * max_y);
-    int max_row_y = int((join.max.y - domain.min.y) / domain.size_y() * max_y) + 1;
-    int min_row_z = int((join.min.z - domain.min.z) / domain.size_z() * max_z);
-    int max_row_z = int((join.max.z - domain.min.z) / domain.size_z() * max_z) + 1;
+    int min_row_x = int((join.min.x - domain.min.x) / domain.size_x() * (max_x - 1));
+    int max_row_x = int((join.max.x - domain.min.x) / domain.size_x() * (max_x - 1)) + 1;
+    int min_row_y = int((join.min.y - domain.min.y) / domain.size_y() * (max_y - 1));
+    int max_row_y = int((join.max.y - domain.min.y) / domain.size_y() * (max_y - 1)) + 1;
+    int min_row_z = int((join.min.z - domain.min.z) / domain.size_z() * (max_z - 1));
+    int max_row_z = int((join.max.z - domain.min.z) / domain.size_z() * (max_z - 1)) + 1;
 
     std::vector<Rows> rows;
     rows.reserve((max_row_x - min_row_x) * (max_row_y - min_row_y) * (max_row_z - min_row_z));
     for (int x = min_row_x; x < max_row_x; x++) {
         for (int y = min_row_y; y < max_row_y; y++) {
             for (int z = min_row_z; z < max_row_z; z++) {
-                if (is_inside(x, y, z)) rows.push_back(Rows(x, y, z));
+                rows.push_back(Rows(x, y, z));
             }
         }
     }
     return rows;
   }
 
-  bool is_inside(int x, int y, int z) {
-      return (
-             x >= 0 && x < max_x
-          && y >= 0 && y < max_y
-          && z >= 0 && z < max_z
-          );
+  bool is_inside(int &x, int &y, int &z) {
+    return (
+           x >= 0 && x < max_x
+        && y >= 0 && y < max_y
+        && z >= 0 && z < max_z
+    );
   }
 
   unsigned int& value(const unsigned int& x, const unsigned int& y, const unsigned int& z) {
