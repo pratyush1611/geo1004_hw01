@@ -197,10 +197,32 @@ int main(int argc, const char * argv[])
     }
 
     // Fill model
-    // todo
-    
+    // todo: snowflake method
+
+    for(int i= 0; i<voxels.max_x; i++)
+    {
+        for(int j=0 ;  j<voxels.max_y; j++)
+        {
+            int flag=0;
+            for(int k=voxels.max_z-1; k>=0 ;k--)
+            {
+                if( voxels(i,j,k) == 1)//touched a filled voxel
+                {
+                    flag=1;
+                }
+
+                if(flag != 1) //means not hit the boudary yet
+                {
+                    //update the cell value to exterior
+                    voxels(i,j,k) = 0;
+                }
+            }
+
+        }
+    }
+
     std::cout << "Writing to " << file_out << "\n";
-    
+
     // Write voxels
     std::ofstream file(file_out);
     float size = voxel_size * 0.8;
@@ -209,13 +231,14 @@ int main(int argc, const char * argv[])
     for (int x = 0; x < voxels.max_x; x++) {
         for (int y = 0; y < voxels.max_y; y++) {
             for (int z = 0; z < voxels.max_z; z++) {
-                if (voxels(x, y, z) == 2) continue; // skip exterior voxels
+                if (voxels(x, y, z) == 0) continue; // skip exterior voxels
                 file << to_obj(voxels.center(x, y, z), size, nth);
                 nth++;
             }
         }
     }
     file.close();
+
 
 
     return 13;
