@@ -13,11 +13,11 @@
 float signed_volume(const Point &a, const Point &b, const Point &c, const Point &d)
 {
     // 1/6 * dot(a-d, cross(b-d, c-d))
-    const Point 
+    Point 
         ad = a - d,
         bd = b - d,
         cd = c - d;
-    return 1/6 * ad.dot( bd.cross(cd) );
+    return ad.dot( bd.cross(cd) );
 }
 
 bool is_opposite(const Point& a, const Point& b, const Point& v0, const Point& v1, const Point& v2) 
@@ -115,12 +115,77 @@ std::vector<std::vector<Point>> OD_maker(Point vox_center , float voxel_size)
     return returned_output;
 }
 
-////////////////////////////////////////////______________M.A.I.N__________////////////////
+float test() {
+    Point
+        v0 = Point(0, 0, 0),
+        v1 = Point(0, 1, 0),
+        v2 = Point(1, 0, 0),
+        v3 = Point(0, 0, 1);
+    return signed_volume(v0, v1, v2, v3);
+}
+
+bool test1() {
+    Point
+        or = Point(3.165499, 2.089558, -1.217546),
+        de = Point(1.039114, 3.659356, 4.467535),
+        v0 = Point(1.570662, 8.361499, 0.064418),
+        v1 = Point(6.161035, 0.583111, 2.420822),
+        v2 = Point(1.570662, 8.361499, 0.064418);
+    return intersects(or, de, v0, v1, v2);
+}
+
+bool test2() {
+    Point
+        or = Point(5.267698, 5.127231, -1.217546),
+        de = Point(2.878305, 3.997372, 4.467535),
+        v0 = Point(1.570662, 8.361499, 0.064418),
+        v1 = Point(6.161035, 0.583111, 2.420822),
+        v2 = Point(1.570662, 8.361499, 0.064418);
+    return intersects(or, de, v0, v1, v2);
+}
+
+bool test3() {
+    Point
+        or = Point(5.267698, 5.127231, -1.217546),
+        de = Point(2.878305, 3.997372, 4.467535),
+        v0 = Point(1.570662, 8.361499, 0.064418),
+        v1 = Point(6.161035, 0.583111, 2.420822),
+        v2 = Point(1.570662, 8.361499, 0.064418);
+    return is_opposite(or, de, v0, v1, v2);
+}
+
+float test4() {
+    Point
+        or = Point(5.267698, 5.127231, -1.217546),
+        de = Point(2.878305, 3.997372, 4.467535),
+        v0 = Point(1.570662, 8.361499, 0.064418),
+        v1 = Point(6.161035, 0.583111, 2.420822),
+        v2 = Point(1.570662, 8.361499, 0.064418);
+    return signed_volume(or, v0, v1, v2);
+}
+
+float test5() {
+    Point
+        or = Point(5.267698, 5.127231, -1.217546),
+        de = Point(2.878305, 3.997372, 4.467535),
+        v0 = Point(1.570662, 8.361499, 0.064418),
+        v1 = Point(6.161035, 0.583111, 2.420822),
+        v2 = Point(1.570662, 8.361499, 0.064418);
+    return signed_volume(de, v0, v1, v2);
+}
+
 int main(int argc, const char * argv[])
 {
     const char *file_in = "bag_bk.obj";
     const char *file_out = "vox.obj";
-    float voxel_size = 10.0;
+    float voxel_size = 1.0;
+
+    float res = test();
+    bool res1 = test1();
+    bool res2 = test2();
+    bool res3 = test3();
+    float res4 = test4();
+    float res5 = test5();
 
     // Read file
     std::vector<Point> vertices;
@@ -175,14 +240,12 @@ int main(int argc, const char * argv[])
         if(triangle.size() != 3) std::cout << "haha, found ya, " << triangle.size() <<'\n';
 
         // extract vertex of face and store it in fc_rvtx
-        std::vector<Point> fc_vrtx = {vertices[triangle[0] - 1],vertices[triangle[1] - 1],vertices[triangle[2] - 1]};
+        std::vector<Point> fc_vrtx = {vertices[triangle[0] - 1], vertices[triangle[1] - 1], vertices[triangle[2] - 1]};
 
         // for every face, run all the voxel, or for every voxel run all the faces
         Bbox facebounds(fc_vrtx); //get bbox of the face
         //find voxels in this bbox
-        std::cout<< "before rows thingy \n";
         std::vector<Rows> bnd_vox = voxels.intersection(facebounds);
-        std::cout<<"starting loop to do intersection check\n";
         //check intersections with these voxels
         for(auto row_: bnd_vox)
         {
