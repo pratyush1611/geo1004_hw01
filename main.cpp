@@ -93,23 +93,22 @@ std::string to_obj(Point center, float size, int nth) {
 
 std::vector<std::vector<Point>> OD_maker(Point vox_center , float voxel_size)
 {
-    Point xline_orig = vox_center - Point {voxel_size/2, 0, 0};
-    Point xline_dest = vox_center + Point {voxel_size/2, 0, 0};
+    float half = voxel_size / 2.0;
+    Point xline_orig = vox_center - Point {half, 0, 0};
+    Point xline_dest = vox_center + Point {half, 0, 0};
 
-    Point yline_orig = vox_center - Point {0, voxel_size/2, 0};
-    Point yline_dest = vox_center + Point {0, voxel_size/2, 0};
+    Point yline_orig = vox_center - Point {0, half, 0};
+    Point yline_dest = vox_center + Point {0, half, 0};
 
-    Point zline_orig = vox_center - Point {0, 0, voxel_size/2};
-    Point zline_dest = vox_center + Point {0, 0, voxel_size/2};
+    Point zline_orig = vox_center - Point {0, 0, half};
+    Point zline_dest = vox_center + Point {0, 0, half};
 
     std::vector<Point> xline{xline_orig, xline_dest};
     std::vector<Point> yline{yline_orig, yline_dest};
     std::vector<Point> zline{zline_orig, zline_dest};
-    //return a vector of these origin destinations vectors
-    std::vector<std::vector<Point>> returned_output;
-    returned_output =  {xline, yline, zline};
-
-    return returned_output;
+    
+    std::vector<std::vector<Point>> result{ xline, yline, zline };
+    return result;
 }
 
 
@@ -127,20 +126,18 @@ int main(int argc, const char * argv[])
     std::ifstream infile(file_in, std::ifstream::in);
     if(!infile)
     {
-        std::cout<<"Cant open :(\n";
+        std::cout<<"Cant open " << file_in << " :( \n";
         return 1;
     }
 
     std::string str;
     while(std::getline(infile,str))
     {
-
         if (strnicmp(str.c_str(), "v", strlen("v") ) == 0)
         {
             Point vert = splitter(str);
             vertices.push_back(vert);
         }
-
         else if (strnicmp(str.c_str(), "f", strlen("v") ) == 0)
         {
             Point vert = splitter(str);
@@ -151,8 +148,8 @@ int main(int argc, const char * argv[])
             std::vector<unsigned int> fac = {fx,fy,fz};
             faces.push_back(fac);
         }
-    } // end of while
-    infile.close(); //close file
+    }
+    infile.close();
 
 
     // get boundig box of all .obj vertices
@@ -161,14 +158,11 @@ int main(int argc, const char * argv[])
     // create voxels using voxelGrid with number rows in X, Y and Z axis as per voxel size
     VoxelGrid voxels(bounds, voxel_size);
     
-    std::cout << "Voxelizing the model. \n";
+    std::cout << "Voxelizing the model \n";
     
     // Voxelise
     for (auto const &triangle: faces)
     {
-        // todo
-        if(triangle.size() != 3) std::cout << "haha, found ya, " << triangle.size() <<'\n';
-
         // extract vertex of face and store it in fc_rvtx
         std::vector<Point> fc_vrtx = {vertices[triangle[0] - 1], vertices[triangle[1] - 1], vertices[triangle[2] - 1]};
 
@@ -184,7 +178,7 @@ int main(int argc, const char * argv[])
             //get coord of the 3 lines
             //lets call the line xline, yline, zline
             //and the two ends of this line are orig and dest
-            std::vector<std::vector<Point>> OD_pts =  OD_maker( vox_center ,  voxel_size);
+            std::vector<std::vector<Point>> OD_pts =  OD_maker(vox_center, voxel_size);
             //once you have the orig dest do the test
             if(intersects(OD_pts[0][0], OD_pts[0][1], fc_vrtx[0], fc_vrtx[1], fc_vrtx[2])
             || intersects(OD_pts[1][0], OD_pts[1][1], fc_vrtx[0], fc_vrtx[1], fc_vrtx[2])
@@ -203,7 +197,7 @@ int main(int argc, const char * argv[])
     
     // Write voxels
     std::ofstream file(file_out);
-    float size = voxel_size * 0.8;
+    float size = voxel_size * 0.7;
 
     int nth = 0;
     for (int x = 0; x < voxels.max_x; x++) {
