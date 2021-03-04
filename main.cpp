@@ -12,7 +12,7 @@
 
 float signed_volume(const Point &a, const Point &b, const Point &c, const Point &d)
 {
-    // 1/6 * dot(a-d, cross(b-d, c-d))
+    // 1/6 * dot(a-d, cross(b-d, c-d)), ditch the 1/6, we need sign only
     Point 
         ad = a - d,
         bd = b - d,
@@ -23,22 +23,19 @@ float signed_volume(const Point &a, const Point &b, const Point &c, const Point 
 bool is_opposite(const Point& a, const Point& b, const Point& v0, const Point& v1, const Point& v2) 
 {
     // signed volume multiple will be negative if the points are on the opposite sides
-    // returns true if they are on opposite sides
     return ( 0 >= signed_volume(v0, v1, v2, a) * signed_volume(v0, v1, v2, b) );
 }
+
 
 bool intersects(const Point &orig, const Point &dest, const Point &v0, const Point &v1, const Point &v2)
 {
     // endpoints of the line are on opposite sides of the triangle
     // three planes passing through the line and each vertex of the triangle
     // have the two other vertices on opposite sides
-
-    //returns TRUE if all statements are TRUE, i.e. they are all opposite to one another
     return (
         is_opposite(orig, dest, v0, v1, v2)
         && is_opposite(v0, v1, orig, dest, v2)
         && is_opposite(v1, v2, orig, dest, v0)
-        && is_opposite(v2, v0, orig, dest, v1)
     );
 }
 
@@ -115,77 +112,12 @@ std::vector<std::vector<Point>> OD_maker(Point vox_center , float voxel_size)
     return returned_output;
 }
 
-float test() {
-    Point
-        v0 = Point(0, 0, 0),
-        v1 = Point(0, 1, 0),
-        v2 = Point(1, 0, 0),
-        v3 = Point(0, 0, 1);
-    return signed_volume(v0, v1, v2, v3);
-}
-
-bool test1() {
-    Point
-        or = Point(3.165499, 2.089558, -1.217546),
-        de = Point(1.039114, 3.659356, 4.467535),
-        v0 = Point(1.570662, 8.361499, 0.064418),
-        v1 = Point(6.161035, 0.583111, 2.420822),
-        v2 = Point(1.570662, 8.361499, 0.064418);
-    return intersects(or, de, v0, v1, v2);
-}
-
-bool test2() {
-    Point
-        or = Point(5.267698, 5.127231, -1.217546),
-        de = Point(2.878305, 3.997372, 4.467535),
-        v0 = Point(1.570662, 8.361499, 0.064418),
-        v1 = Point(6.161035, 0.583111, 2.420822),
-        v2 = Point(1.570662, 8.361499, 0.064418);
-    return intersects(or, de, v0, v1, v2);
-}
-
-bool test3() {
-    Point
-        or = Point(5.267698, 5.127231, -1.217546),
-        de = Point(2.878305, 3.997372, 4.467535),
-        v0 = Point(1.570662, 8.361499, 0.064418),
-        v1 = Point(6.161035, 0.583111, 2.420822),
-        v2 = Point(1.570662, 8.361499, 0.064418);
-    return is_opposite(or, de, v0, v1, v2);
-}
-
-float test4() {
-    Point
-        or = Point(5.267698, 5.127231, -1.217546),
-        de = Point(2.878305, 3.997372, 4.467535),
-        v0 = Point(1.570662, 8.361499, 0.064418),
-        v1 = Point(6.161035, 0.583111, 2.420822),
-        v2 = Point(1.570662, 8.361499, 0.064418);
-    return signed_volume(or, v0, v1, v2);
-}
-
-float test5() {
-    Point
-        or = Point(5.267698, 5.127231, -1.217546),
-        de = Point(2.878305, 3.997372, 4.467535),
-        v0 = Point(1.570662, 8.361499, 0.064418),
-        v1 = Point(6.161035, 0.583111, 2.420822),
-        v2 = Point(1.570662, 8.361499, 0.064418);
-    return signed_volume(de, v0, v1, v2);
-}
 
 int main(int argc, const char * argv[])
 {
     const char *file_in = "bag_bk.obj";
     const char *file_out = "vox.obj";
     float voxel_size = 1.0;
-
-    float res = test();
-    bool res1 = test1();
-    bool res2 = test2();
-    bool res3 = test3();
-    float res4 = test4();
-    float res5 = test5();
 
     // Read file
     std::vector<Point> vertices;
