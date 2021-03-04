@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <chrono>
 
 #include "Point.h"
 #include "Rows.h"
@@ -146,6 +147,8 @@ int main(int argc, const char * argv[])
     }
     infile.close();
 
+    // Start of benchmark timing
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     // get boundig box of all .obj vertices
     const Bbox bounds = Bbox(vertices);
@@ -154,7 +157,7 @@ int main(int argc, const char * argv[])
     VoxelGrid voxels(bounds, voxel_size);
     
     // Voxelise
-    std::cout << "Voxelizing the model " << "\n";
+    std::cout << "Voxelizing the boundary " << "\n";
     
     for (auto const &triangle: faces)
     {
@@ -188,8 +191,11 @@ int main(int argc, const char * argv[])
     }
 
     // Get volume
-    std::cout << "\n\t" << "Total volume of the model is: ";
-    std::cout << voxels.volume() << " m3 " << "\n\n";
+    std::cout << "\n\t" << "Total volume of the model is: " << voxels.volume() << "[m3]" << "\n";
+
+    // End benchmark timing
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::cout << "\t" << "Finished in " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << "\n\n";
 
     // Write voxels
     std::cout << "Writing model to " << file_out << "\n";
